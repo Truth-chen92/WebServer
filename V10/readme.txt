@@ -1,0 +1,21 @@
+上一个版本我们通过重构HttpResponse发送响应的代码将响应头的发送改为根据设置的响应头
+进行发送。并在ClientHandler处理请求的环节临时创建了一个Map保存了6个常见的
+资源类型和对应的Content-Type的值并通过用户实际请求的资源后缀设置响应头，从而实现
+了正常显示学子商城和稻草问答项目页面
+
+这里有两个问题需要解决
+1：Map的复用（没有必要每个请求来了都创建一遍这个Map)
+2：Map中内容的扩充（要支持所有资源类型的Content-Type的值，共1000多种）
+
+解决Map的复用问题：
+1：在com.webserver.http包下新建一个类：HttpContent
+   这个类用于保存所有HTTP协议规定的可以重用的内容
+2：在HttpContext中定义一个静态的属性Map mimiMapping用于存放所有Content-Type的值
+3：在静态块中初始化mimeMapping，并提供公开方法getMimeType可以根据资源后缀获取Content-Type的值
+这样一来ClentHandler每次获取到资源后缀后就无需创建Map，而是从HttpContent中调用getMimeType
+方法直接根据后缀获取Content-Type的值设置响应头即可
+
+重构ClientHandler中设置响应头的代码
+由于一个响应中只要有响应正文就应当包含两个响应头Content-Type和Content-Length，因此我们可以
+ClientHandler中设置两个响应头的工作移动到设置响应正文的方法setEntity中。这样一来将来只要设置了
+响应正文，就会自动根据该文件添加这两个响应头了

@@ -1,0 +1,23 @@
+上一個版本中我們在ClientHandler第一個環節：解析請求
+中完成了對客戶端發送過來的請求的解析工作，並用幾個不同的變量保存了請求
+中個部分信息
+
+這個版本我們對代碼進行一次重構，將解析請求的具體工作從ClientHandler拆分
+出去
+
+我們設計一個類HttpRequest,用這個類的每一個實例表示客戶端發送過來的一個
+請求的所有內容。將之前在ClientHandler中定義保存請求各部分信息的變量在
+HttpRequest中作為屬性定義出來
+並在構造方法中完成對請求的解析，然後將請求各部分信息保存在HttpRequest
+的對應屬性上。這樣一來，每當一個客戶端連接，ClientHandler只需要在解析請求
+的環節實例化一個HttpRequest(調用它的構造方法)就可以完成解析請求的
+工作了。並且實例化的HttpReuqest的對象中用屬性保存了這次客戶端發送過來的
+請求的所有內容
+
+實現：
+1：新建一個包：com.webserver.http
+   這個包存放所有和HTTP協議有關的類
+2：在這個包中新建一個類：HttpReuqest，請求對象
+   這個類的每一個實例用語表示客戶端發送過來的一個請求內容
+3：將ClientHandler解析請求的過程移動到HttpReuqest中
+4：ClientHandler第一部解析請求改為實例化HttpReuqest即可
